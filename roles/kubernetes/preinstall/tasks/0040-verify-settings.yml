@@ -334,4 +334,4 @@
     pkgs_lists: "{{ pkgs.keys() | list }}"
   assert:
     that: "pkgs_lists | sort == pkgs_lists"
-    fail_msg: "pkgs is not sorted: {{ pkgs_lists | ansible.utils.fact_diff(pkgs_lists | sort) }}"
+    fail_msg: "pkgs is not sorted"
