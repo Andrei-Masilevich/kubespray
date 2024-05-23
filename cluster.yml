@@ -1,3 +1,30 @@
 ---
+- hosts: all
+  roles:
+    - user
+
+- hosts: all
+  tasks:
+    - name: Check k8s.kubespray.log
+      stat:
+        path: "{{service_state_dir}}/k8s.kubespray.log"
+      register: k8s_kubespray_log
+      when: not ansible_check_mode
+
 - name: Install Kubernetes
   ansible.builtin.import_playbook: playbooks/cluster.yml
+  when:
+    - not ansible_check_mode
+    - not k8s_kubespray_log.stat.exists
+
+- hosts: all
+  tasks:
+    - name: Register k8s.kubespray.log
+      become: true
+      become_user: "{{service_user}}"
+      copy:
+        content: DONE
+        dest: "{{service_state_dir}}/k8s.kubespray.log"
+      when:
+        - not ansible_check_mode
+        - not k8s_kubespray_log.stat.exists
